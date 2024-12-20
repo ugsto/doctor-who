@@ -11,7 +11,6 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        // Carrega o SearchFragment se não estiver carregado ainda
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()

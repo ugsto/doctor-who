@@ -3,15 +3,14 @@ package com.example.doctorwho;
 import java.util.List;
 
 public class Disease {
-    private String nome;
-    private String descricao;
-    private List<String> sintomas;
+    private final String nome;
+    private final String description;
+    private final List<String> symptoms;
 
-    // Construtor
-    public Disease(String nome, String descricao, List<String> sintomas) {
+    public Disease(String nome, String description, List<String> symptoms) {
         this.nome = nome;
-        this.descricao = descricao;
-        this.sintomas = sintomas;
+        this.description = description;
+        this.symptoms = symptoms;
     }
 
     // Getters
@@ -19,11 +18,11 @@ public class Disease {
         return nome;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getDescription() {
+        return description;
     }
 
-    public List<String> getSintomas() {
-        return sintomas;
+    public List<String> getSymptoms() {
+        return symptoms;
     }
 }

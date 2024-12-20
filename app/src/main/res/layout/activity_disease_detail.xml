@@ -7,10 +7,17 @@
 
     <TextView
         android:id="@+id/disease_name"
-        android:layout_width="381dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="22sp"
         android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/disease_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/disease_description"
@@ -18,19 +25,16 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
 
-    <TextView
-        android:id="@+id/disease_treatment"
+    <ListView
+        android:id="@+id/disease_symptoms_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textStyle="italic" />
+        android:layout_marginTop="16dp" />
 
-    <TextView
-        android:id="@+id/disease_symptoms"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/audio_button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textStyle="normal"
-        android:textSize="16sp" />
-
+        android:text="Play" />
 </LinearLayout>

@@ -15,46 +15,46 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
 
-    private RecyclerView suggestionsRecycler, selectedRecycler, diseasesRecycler;
     private SuggestionsAdapter suggestionsAdapter;
     private SelectedAdapter selectedAdapter;
     private DiseasesAdapter diseasesAdapter;
 
-    private List<String> allSymptoms;      // Lista completa de sintomas
-    private List<String> filteredSymptoms; // Lista de sintomas filtrados
-    private List<String> selectedSymptoms; // Lista de sintomas selecionados
-    private List<Disease> associatedDiseases; // Lista de doenças associadas
+    private List<String> allSymptoms;
+    private List<String> filteredSymptoms;
+    private List<String> selectedSymptoms;
+    private List<Disease> associatedDiseases;
 
     private android.widget.EditText searchInput;
+
+    private DiseaseRepository diseaseRepository;
+    private PreferencesManager preferencesManager;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        // Inicializa componentes da UI
-        searchInput = view.findViewById(R.id.search_input);
-        suggestionsRecycler = view.findViewById(R.id.suggestions_recycler);
-        selectedRecycler = view.findViewById(R.id.selected_recycler);
-        diseasesRecycler = view.findViewById(R.id.diseases_recycler);
+        diseaseRepository = new DiseaseRepository(requireContext());
+        preferencesManager = new PreferencesManager(requireContext());
 
-        // Inicializa listas
-        allSymptoms = Arrays.asList("Febre", "Tosse", "Cansaço", "Dor de cabeça", "Coriza", "Náusea");
+        searchInput = view.findViewById(R.id.search_input);
+        RecyclerView suggestionsRecycler = view.findViewById(R.id.suggestions_recycler);
+        RecyclerView selectedRecycler = view.findViewById(R.id.selected_recycler);
+        RecyclerView diseasesRecycler = view.findViewById(R.id.diseases_recycler);
+
+        allSymptoms = getAllSymptoms();
         filteredSymptoms = new ArrayList<>();
-        selectedSymptoms = new ArrayList<>();
+        selectedSymptoms = preferencesManager.getSelectedSymptoms(); // Load saved symptoms
         associatedDiseases = new ArrayList<>();
 
-        // Configura os Adapters
         suggestionsAdapter = new SuggestionsAdapter(filteredSymptoms, this::addSelectedSymptom);
         selectedAdapter = new SelectedAdapter(selectedSymptoms, this::removeSelectedSymptom);
         diseasesAdapter = new DiseasesAdapter(associatedDiseases, this::openDiseaseDetail);
 
-        // Configura os RecyclerViews
         suggestionsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         suggestionsRecycler.setAdapter(suggestionsAdapter);
 
@@ -64,10 +64,10 @@ public class SearchFragment extends Fragment {
         diseasesRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         diseasesRecycler.setAdapter(diseasesAdapter);
 
-        // Listener para o campo de busca
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -75,13 +75,28 @@ public class SearchFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {
+            }
         });
+
+        updateAssociatedDiseases();
 
         return view;
     }
 
-    // Filtrar os sintomas conforme o texto digitado
+    private List<String> getAllSymptoms() {
+        List<Disease> diseases = diseaseRepository.getDiseases();
+        List<String> symptoms = new ArrayList<>();
+        for (Disease disease : diseases) {
+            for (String symptom : disease.getSymptoms()) {
+                if (!symptoms.contains(symptom)) {
+                    symptoms.add(symptom);
+                }
+            }
+        }
+        return symptoms;
+    }
+
     private void filterSymptoms(String query) {
         filteredSymptoms.clear();
         if (!query.isEmpty()) {
@@ -94,31 +109,31 @@ public class SearchFragment extends Fragment {
         suggestionsAdapter.notifyDataSetChanged();
     }
 
-    // Adicionar um sintoma selecionado
     private void addSelectedSymptom(String symptom) {
         if (!selectedSymptoms.contains(symptom)) {
             selectedSymptoms.add(symptom);
+            preferencesManager.saveSelectedSymptoms(selectedSymptoms); // Save updated symptoms
             selectedAdapter.notifyDataSetChanged();
             updateAssociatedDiseases();
         }
-        searchInput.setText(""); // Limpa o campo de busca
+        searchInput.setText("");
         filteredSymptoms.clear();
         suggestionsAdapter.notifyDataSetChanged();
     }
 
-    // Remover um sintoma selecionado
     private void removeSelectedSymptom(String symptom) {
         selectedSymptoms.remove(symptom);
+        preferencesManager.saveSelectedSymptoms(selectedSymptoms); // Save updated symptoms
         selectedAdapter.notifyDataSetChanged();
         updateAssociatedDiseases();
     }
 
-    // Atualizar as doenças associadas com base nos sintomas selecionados
     private void updateAssociatedDiseases() {
         associatedDiseases.clear();
-        for (Disease disease : MockData.getMockDiseases()) {
+        List<Disease> diseases = diseaseRepository.getDiseases();
+        for (Disease disease : diseases) {
             for (String symptom : selectedSymptoms) {
-                if (disease.getSintomas().contains(symptom) && !associatedDiseases.contains(disease)) {
+                if (disease.getSymptoms().contains(symptom) && !associatedDiseases.contains(disease)) {
                     associatedDiseases.add(disease);
                 }
             }
@@ -126,12 +141,11 @@ public class SearchFragment extends Fragment {
         diseasesAdapter.notifyDataSetChanged();
     }
 
-    // Abrir detalhes da doença em uma nova Activity
     private void openDiseaseDetail(Disease disease) {
         Intent intent = new Intent(getActivity(), DiseaseDetailActivity.class);
         intent.putExtra("name", disease.getNome());
-        intent.putExtra("description", disease.getDescricao());
-        intent.putExtra("symptoms", String.join(", ", disease.getSintomas()));
+        intent.putExtra("description", disease.getDescription());
+        intent.putExtra("symptoms", String.join(", ", disease.getSymptoms()));
         startActivity(intent);
     }
 }

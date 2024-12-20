@@ -12,15 +12,14 @@ import java.util.List;
 
 public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.ViewHolder> {
 
-    private List<String> selectedSymptoms; // Lista de sintomas selecionados
-    private OnSymptomClickListener listener; // Listener para cliques
+    private final List<String> selectedSymptoms;
+    private final OnSymptomClickListener listener;
 
-    // Interface para tratar cliques nos itens
+
     public interface OnSymptomClickListener {
         void onSymptomClick(String symptom);
     }
 
-    // Construtor
     public SelectedAdapter(List<String> selectedSymptoms, OnSymptomClickListener listener) {
         this.selectedSymptoms = selectedSymptoms;
         this.listener = listener;
@@ -29,7 +28,6 @@ public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.ViewHo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflar o layout do item
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(android.R.layout.simple_list_item_1, parent, false);
         return new ViewHolder(view);
@@ -37,11 +35,9 @@ public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Configurar os dados
         String symptom = selectedSymptoms.get(position);
         holder.textView.setText(symptom);
 
-        // Adicionar evento de clique para remover o sintoma
         holder.itemView.setOnClickListener(v -> listener.onSymptomClick(symptom));
     }
 
@@ -50,7 +46,6 @@ public class SelectedAdapter extends RecyclerView.Adapter<SelectedAdapter.ViewHo
         return selectedSymptoms.size();
     }
 
-    // ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
 

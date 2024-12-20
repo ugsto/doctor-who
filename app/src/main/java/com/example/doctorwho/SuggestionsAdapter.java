@@ -12,15 +12,13 @@ import java.util.List;
 
 public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.ViewHolder> {
 
-    private List<String> suggestions; // Lista de sintomas sugeridos
-    private OnSymptomClickListener listener; // Listener para cliques
+    private List<String> suggestions;
+    private OnSymptomClickListener listener;
 
-    // Interface para tratar cliques nos itens
     public interface OnSymptomClickListener {
         void onSymptomClick(String symptom);
     }
 
-    // Construtor
     public SuggestionsAdapter(List<String> suggestions, OnSymptomClickListener listener) {
         this.suggestions = suggestions;
         this.listener = listener;
@@ -29,7 +27,6 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflar o layout do item
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(android.R.layout.simple_list_item_1, parent, false);
         return new ViewHolder(view);
@@ -37,11 +34,9 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Configurar os dados
         String symptom = suggestions.get(position);
         holder.textView.setText(symptom);
 
-        // Adicionar evento de clique para adicionar o sintoma
         holder.itemView.setOnClickListener(v -> listener.onSymptomClick(symptom));
     }
 
@@ -50,7 +45,6 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
         return suggestions.size();
     }
 
-    // ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
 
